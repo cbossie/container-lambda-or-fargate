@@ -3,6 +3,9 @@
 ##
 ## Get latest from https://github.com/github/gitignore/blob/master/VisualStudio.gitignore
 
+aws-ecs-tools-defaults.json
+aws-lambda-tools-defaults.json
+
 # User-specific files
 *.rsuser
 *.suo

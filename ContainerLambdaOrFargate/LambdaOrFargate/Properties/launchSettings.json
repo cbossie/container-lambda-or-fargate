@@ -1,0 +1,11 @@
+{
+  "profiles": {
+    "LambdaOrFargate": {
+      "commandName": "Project"
+    },
+    "Docker": {
+      "commandName": "Docker",
+      "commandLineArgs": "craig"
+    }
+  }
+}
