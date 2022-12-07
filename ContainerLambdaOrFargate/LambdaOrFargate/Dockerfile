@@ -17,4 +17,4 @@ RUN dotnet publish "LambdaOrFargate.csproj" -c Release -o /app/publish /p:UseApp
 FROM base AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
-ENTRYPOINT ["dotnet", "LambdaOrFargate.dll"]
+ENTRYPOINT ["dotnet", "LambdaOrFargate.dll", "hello"]
