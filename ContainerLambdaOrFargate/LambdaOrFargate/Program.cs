@@ -29,7 +29,6 @@ static async Task<InvocationResponse> LambdaFunction(InvocationRequest invocatio
     foreach(var env in Environment.GetEnvironmentVariables().Keys)
     {
         invocation.LambdaContext.Logger.LogLine($"Key:{env}, Val:{Environment.GetEnvironmentVariable(env?.ToString())}");
-
     }
 
     ResponseStream.SetLength(0);
