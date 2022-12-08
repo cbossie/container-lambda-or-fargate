@@ -10,20 +10,12 @@ module "vpc" {
   public_subnets         = slice(cidrsubnets(var.vpccidr, 4, 4, 4, 4, 4, 4), 3, 6)
   create_vpc             = true
   one_nat_gateway_per_az = true
-
+  count = var.include_vpc ? 1 : 0
 }
 
 #S3
 resource "aws_s3_bucket" "output_bucket" {
   bucket = "lambda-or-fargate-bucket-${data.aws_caller_identity.current.account_id}"
-}
-
-
-# ECR
-
-resource "aws_ecr_repository" "fargatelambda_repo" {
-  name                 = "fargatelambda-repo"
-  image_tag_mutability = "MUTABLE"
 }
 
 #ECS
@@ -33,9 +25,6 @@ module "ecs_cluster" {
 
 
   cluster_name = "ecs-fargate-or-lambda"
-
-
-
 }
 
 resource "aws_iam_policy" "ecs_policy" {

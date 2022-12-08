@@ -18,3 +18,8 @@ variable "ecr_repository" {
   type        = string
   description = "Repository to Use"
 }
+
+variable "include_vpc" {
+  type = bool
+  default = false
+}
