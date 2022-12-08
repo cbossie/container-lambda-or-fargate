@@ -10,6 +10,8 @@ using Amazon.Runtime;
 string s3Bucket = Environment.GetEnvironmentVariable("OUTPUT_BUCKET");
 string fileName = Environment.GetEnvironmentVariable("FILE_NAME");
 
+// Check for the AWS_LAMBDA_FUNCTION_NAME environment variable. If it is not there, then
+// we will run as usual in a container. Otherwise, we will run as if in lambda
 if (string.IsNullOrEmpty(Environment.GetEnvironmentVariable("AWS_LAMBDA_FUNCTION_NAME")))
 {
     Console.Write("Lamdba Function Name Not Found - Running as Container");
@@ -24,8 +26,6 @@ if (string.IsNullOrEmpty(Environment.GetEnvironmentVariable("AWS_LAMBDA_FUNCTION
         Console.WriteLine(ex.Message);
         Console.WriteLine(ex.StackTrace);
     }
-    
-
 }
 else
 {
@@ -66,12 +66,6 @@ async Task<InvocationResponse> LambdaFunction(InvocationRequest invocation)
     
     return new InvocationResponse(ResponseStream, false);
 }
-
- static async Task<string> ToUpperAsync(string str)
-{
-    return str?.ToUpper();
-}
-
 
 static async Task WriteToS3(string bucketName, string fileNamePrefix, string environment)
 {
