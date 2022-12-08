@@ -18,58 +18,65 @@ if (string.IsNullOrEmpty(Environment.GetEnvironmentVariable("AWS_LAMBDA_FUNCTION
 
     try
     {
-        await WriteToS3(s3Bucket, fileName, "Fargate");
+        string contents = args.Length > 0 ? args[0] : "No container args supplied";
+
+        await WriteToS3(s3Bucket, fileName, "Fargate", contents);
     }
     catch (Exception ex)
     {
-
         Console.WriteLine(ex.Message);
         Console.WriteLine(ex.StackTrace);
     }
 }
 else
 {
+    // Not in container - bootstrap the Lambda Runtime
     using var bootstrap = new LambdaBootstrap(LambdaFunction);
     await bootstrap.RunAsync();
 }
 
+// The official lambda handler.
 async Task<InvocationResponse> LambdaFunction(InvocationRequest invocation)
 {
     DefaultLambdaJsonSerializer serializer = new DefaultLambdaJsonSerializer();
     MemoryStream ResponseStream = new MemoryStream();
     Console.WriteLine("In Lambda Function");
 
-    string output;
-
-
-    invocation.LambdaContext.Logger.LogLine("INVOKING");
-    foreach(var env in Environment.GetEnvironmentVariables().Keys)
-    {
-        invocation.LambdaContext.Logger.LogLine($"Key:{env}, Val:{Environment.GetEnvironmentVariable(env?.ToString())}");
-        output = $"Lamdba Executed OK";
-    }
+    //Get the data as invocation data
+    string input;
     try
     {
-        await WriteToS3(s3Bucket, fileName, "Lambda");
+        input = JsonSerializer.Deserialize<string>(invocation.InputStream);
+    }
+    catch (Exception ex)
+    {
+        Console.Write("Unable to parse input to lambda - using default value");
+        input = "No Lambda args supplied";
+    }
+
+    invocation.LambdaContext.Logger.LogLine("INVOKING");
+    try
+    {
+        await WriteToS3(s3Bucket, fileName, "Lambda", input);
     }
     catch(Exception ex)
     {
         Console.WriteLine(ex.Message);
         Console.WriteLine(ex.StackTrace);
-        output = $"Error: {ex.Message}";
     }
 
     ResponseStream.SetLength(0);
     serializer.Serialize("Lambda Complete", ResponseStream);
-    ResponseStream.Position = 0;
-
-    
+    ResponseStream.Position = 0;    
     return new InvocationResponse(ResponseStream, false);
 }
 
-static async Task WriteToS3(string bucketName, string fileNamePrefix, string environment)
+// Simple function that writes a string to S3. You can see that in the bucket, there will be 
+// files starting with CONTAINER_ and files starting with LAMBDA_, so one container will put data
+// from different runtimes
+static async Task WriteToS3(string bucketName, string fileNamePrefix, string environment, string contents = "No contents")
 {
-    string contents = $"This data was written at {DateTime.Now} from {environment}";
+    contents = contents ?? $"This data was written at {DateTime.Now} from {environment}";
     string fileName = $"{fileNamePrefix}{DateTime.Now:yyyyMMddTHHmmss}.txt";
 
 
