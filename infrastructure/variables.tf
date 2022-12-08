@@ -13,3 +13,8 @@ variable "vpccidr" {
   description = "CIDR range"
   default     = "10.0.0.0/16"
 }
+
+variable "ecr_repository" {
+  type        = string
+  description = "Repository to Use"
+}

@@ -1,11 +1,20 @@
 {
   "profiles": {
     "LambdaOrFargate": {
-      "commandName": "Project"
+      "commandName": "Project",
+      "environmentVariables": {
+        "AWS_PROFILE": "dotnet-west-2",
+        "OUTPUT_BUCKET": "lambda-or-fargate-bucket-425173371283",
+        "FILE_NAME": "LOCAL_DEBUG_"        
+      }
     },
     "Docker": {
       "commandName": "Docker",
-      "commandLineArgs": "craig"
+      "environmentVariables": {
+        "AWS_PROFILE": "dotnet-west-2",
+        "OUTPUT_BUCKET": "lambda-or-fargate-bucket-425173371283",
+        "FILE_NAME": "LOCAL_DEBUG_"
+      }
     }
   }
 }
